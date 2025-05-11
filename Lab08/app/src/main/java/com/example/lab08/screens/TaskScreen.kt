@@ -1,52 +1,18 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.lab08
+package com.example.lab08.screens
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment  // Importar esto para usar Alignment.CenterVertically
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.room.Room
-import com.example.lab08.dao.TaskDao
-import com.example.lab08.db.TaskDatabase
-import com.example.lab08.model.Task
-import kotlinx.coroutines.launch
-import com.example.lab08.ui.theme.Lab08Theme
 import com.example.lab08.viewmodel.TaskViewModel
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            Lab08Theme {
-                // Crear la base de datos
-                val db = Room.databaseBuilder(
-                    applicationContext,
-                    TaskDatabase::class.java,
-                    "task_db"
-                ).build()
-
-                // Crear el DAO y el ViewModel
-                val taskDao = db.TaskDao()
-                val viewModel = TaskViewModel(taskDao)
-
-                // Mostrar la pantalla de tareas
-                TaskScreen(viewModel)
-            }
-        }
-    }
-}
+import kotlinx.coroutines.launch
 
 @Composable
 fun TaskScreen(viewModel: TaskViewModel) {
@@ -133,7 +99,7 @@ fun TaskScreen(viewModel: TaskViewModel) {
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically // Corregido aquí
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(text = task.description)
                         Row {
@@ -143,13 +109,6 @@ fun TaskScreen(viewModel: TaskViewModel) {
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(onClick = { viewModel.deleteTask(task) }) {
                                 Text("Eliminar")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = {
-                                val newDescription = "Tarea editada"
-                                viewModel.editTask(task, newDescription)
-                            }) {
-                                Text("Editar")
                             }
                         }
                     }
@@ -165,22 +124,4 @@ fun TaskScreen(viewModel: TaskViewModel) {
             }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewTaskScreen() {
-    Lab08Theme {
-        TaskScreen(TaskViewModel(object : TaskDao {
-            override suspend fun getAllTasks() = listOf(
-                Task(description = "Prueba 1", isCompleted = false),
-                Task(description = "Prueba 2", isCompleted = true)
-            )
-
-            override suspend fun insertTask(task: Task) {}
-            override suspend fun updateTask(task: Task) {}
-            override suspend fun deleteTask(task: Task) {}
-            override suspend fun deleteAllTasks() {}
-        }))
-    }
 }
